@@ -275,20 +275,20 @@ data = [
 import cv2
 import numpy as np
 img = cv2.imread('C:/Users/luyen/Downloads/demo_mask_rcnn/demo_mask_rcnn/test_images/images (15).jpg')
-size_of_attr_info = []
-for object in data:
-    size_of_attr_info.append(len(object["attribute_info"]))
-object = data[np.argmax(size_of_attr_info)]
-
-bbox = object['bbox']
-img = cv2.rectangle(img, bbox[:2], bbox[2:], (0, 0, 255), 2)
-category = object["category_info"]['name']
-list_attr = {}
-list_attr['category'] = category
-for attr in object["attribute_info"]:
-    r = object["attribute_info"][attr]
-    list_attr[r['supercategory']] = r['name']
-print(list_attr)
+output = []
+for i in range(len(data)):
+    object = data[i]
+    bbox = object['bbox']
+    img = cv2.rectangle(img, bbox[:2], bbox[2:], (0, 0, 255), 2)
+    category = object["category_info"]['name']
+    list_attr = {}
+    list_attr['bbox'] = bbox
+    list_attr['category'] = category
+    for attr in object["attribute_info"]:
+        r = object["attribute_info"][attr]
+        list_attr[r['supercategory']] = r['name']
+    output.append(list_attr)
+print(output)
 cv2.imshow('img', img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

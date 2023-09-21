@@ -363,14 +363,17 @@ def is_image(filename):
         return False
 
 def get_response_msg(data):
-  size_of_attr_info = []
-  for object in data:
-      size_of_attr_info.append(len(object["attribute_info"]))
-  object = data[np.argmax(size_of_attr_info)]
-  category = object["category_info"]['name']
-  list_attr = {}
-  list_attr['category'] = category
-  for attr in object["attribute_info"]:
-      r = object["attribute_info"][attr]
-      list_attr[r['supercategory']] = r['name']
-  return list_attr
+  output = []
+  for i in range(len(data)):
+      object = data[i]
+      bbox = object['bbox']
+      category = object["category_info"]['name']
+      list_attr = {}
+      list_attr['bbox'] = bbox
+      list_attr['category'] = category
+      for attr in object["attribute_info"]:
+          r = object["attribute_info"][attr]
+          list_attr[r['supercategory']] = r['name']
+      output.append(list_attr)
+  return output
+    

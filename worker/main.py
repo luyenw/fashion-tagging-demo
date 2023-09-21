@@ -29,11 +29,12 @@ import hashlib
 import threading 
 
 def on_request(ch, method, props, body):
+    print("Awaiting RPC requests...")
     def process_request():
         begin = time.time()
         hash_object = hashlib.sha256(body).hexdigest()
-        if _redis.hgetall(hash_object):
-            output = _redis.hgetall(hash_object)
+        if _redis.exists(hash_object):
+            output = _redis.lrange(hash_object, 0, -1)
         else:
             n = body.decode()
             contents = base64.b64decode(n)
@@ -41,10 +42,11 @@ def on_request(ch, method, props, body):
             with open(filename, 'wb') as f:
                 f.write(contents)
             output = fibonacci(filename)
-            _redis.hset(hash_object, mapping=output)
+            for obj in output:
+                _redis.rpush(hash_object, str(obj))
             os.remove(filename)
-        output['from'] = 'worker_2'
-        output['target_id'] = props.correlation_id
+        output.append({'from': 'worker_1'})
+        output.append({'target_id': props.correlation_id})
         end = time.time()
         print(f"Sending response: ok {end-begin}")
         ch.basic_publish(
@@ -61,5 +63,4 @@ def on_request(ch, method, props, body):
 
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(queue='rpc_queue', on_message_callback=on_request)
-print("Awaiting RPC requests...")
 channel.start_consuming()

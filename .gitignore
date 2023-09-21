@@ -1,5 +1,3 @@
 api/node_modules/
-worker_1/__pycache__/
-worker_2/__pycache__/
-worker_1/mask_rcnn_model/
-worker_2/mask_rcnn_model/
+worker/__pycache__/
+worker/mask_rcnn_model/
